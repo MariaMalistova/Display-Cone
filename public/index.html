@@ -1,0 +1,56 @@
+<!DOCTYPE html> 
+<html> 
+    <head> 
+        <title>Client Server SPA</title> 
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+                    "OrbitControls": "https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js"
+                }
+            }
+        </script>
+        <script type="module" src="js/geometry.js"></script>
+    </head> 
+    <body> 
+        <h1>Cone</h1> 
+        <label for="height">Enter height:</label> 
+        <input id="height" type="text"><br>
+        <label for="radius">Enter radius:</label> 
+        <input id="radius" type="text"> <br>
+        <label for="segments">Enter number of segments:</label> 
+        <input id="segments" type="text"> <br>
+        <button id="send">Compute</button> <br><br>
+        <canvas></canvas>
+
+        <script type="module"> 
+            import { computeTriangulation, animate } from './js/geometry.js';
+            document.getElementById('send').addEventListener("click", sendData);
+            function sendData() { 
+                const height = document.getElementById('height').value; 
+                const radius = document.getElementById('radius').value; 
+                const segments = document.getElementById('segments').value; 
+                const data = [
+                    height,
+                    radius,
+                    segments,
+                ];
+                fetch('./calculate', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ data }),
+                }) 
+                .then(response => response.json()) 
+                .then(data => { 
+                    computeTriangulation(data.result); 
+                }) 
+                .catch(error => { 
+                    console.error('Error:', error); 
+                }); 
+            }
+
+            animate();
+        </script> 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    </body> 
+</html> 
